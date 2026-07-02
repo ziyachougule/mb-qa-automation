@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+
+# Test tooling
+.pytest_cache/
+reports/
+
+# Virtual environments
+venv/
+.venv/
+
+# OS / editor
+.DS_Store
+
+# Claude Code local settings
+.claude/settings.local.json
