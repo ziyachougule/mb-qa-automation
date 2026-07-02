@@ -4,6 +4,8 @@ UI test automation for the **MultiBank.io crypto marketing site**, built with **
 
 **Base URL under test: `https://mb.io/en-AE`** — covering the main navigation, the spot-trading preview ("Catch your next trade"), marketing banners, app-download links, the Why MultiBank Group company page, 404 handling, and the mobile breakpoint.
 
+**Task 2 answers:** see [docs/qa-strategy.md](docs/qa-strategy.md).
+
 ---
 
 ## ⚠️ Important: why the target is `mb.io/en-AE`, not `trade.mb.io`
