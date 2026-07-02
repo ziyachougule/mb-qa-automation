@@ -3,14 +3,17 @@ from playwright.sync_api import expect
 
 from pages.home_page import HomePage
 
-# (label, href) as rendered in the main nav. $MBG is the only external item
-# (absolute URL, opens in a new tab); the rest are same-site relative paths.
+# (label, href template) as rendered in the main nav. mb.io force-redirects
+# to the geo-detected locale (en-AE locally, en on CI runners), so internal
+# hrefs are templates filled in with the locale actually served — see
+# BasePage.current_locale. $MBG is the only external item (absolute URL,
+# opens in a new tab).
 NAV_ITEMS = [
-    ("Explore", "/en-AE/explore"),
-    ("Features", "/en-AE/features"),
-    ("OTC Desk", "/en-AE/features/otc-desk"),
-    ("Company", "/en-AE/company"),
-    ("Support", "/en-AE/support"),
+    ("Explore", "/{locale}/explore"),
+    ("Features", "/{locale}/features"),
+    ("OTC Desk", "/{locale}/features/otc-desk"),
+    ("Company", "/{locale}/company"),
+    ("Support", "/{locale}/support"),
     ("$MBG", "https://token.multibankgroup.com/en"),
 ]
 NAV_LABELS = [label for label, _ in NAV_ITEMS]
@@ -40,17 +43,18 @@ class TestNavigation:
         home.goto()
 
         nav_items = dict(home.get_nav_items())
-        assert nav_items[label] == expected_href
+        assert nav_items[label] == expected_href.format(locale=home.current_locale)
 
     @pytest.mark.parametrize("label, expected_path", INTERNAL_NAV_ITEMS)
     def test_internal_nav_item_click_navigates(self, page, label, expected_path):
         home = HomePage(page)
         home.goto()
 
+        expected = "https://mb.io" + expected_path.format(locale=home.current_locale)
         home.click_nav_item(label)
         # Client-side (SPA) routing: the URL can update a beat after click()
         # returns, so use an auto-retrying assertion instead of a bare check.
-        expect(page).to_have_url(f"https://mb.io{expected_path}")
+        expect(page).to_have_url(expected)
 
     def test_mbg_nav_item_opens_new_tab(self, page, context):
         home = HomePage(page)
@@ -81,5 +85,6 @@ class TestNavigation:
         home = HomePage(page)
         home.goto()
 
+        expected = f"https://mb.io/{home.current_locale}/company"
         home.click_nav_item("Company")
-        expect(page).to_have_url("https://mb.io/en-AE/company")
+        expect(page).to_have_url(expected)

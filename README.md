@@ -71,7 +71,8 @@ All tests were verified green against the live site (two consecutive runs per fi
 
 ## Assumptions
 
-- **Target URL substitution**: `mb.io/en-AE` stands in for `trade.mb.io` (see the flagged section above); the `/en-AE` locale is pinned since `mb.io/` geo-redirects there.
+- **Target URL substitution**: `mb.io/en-AE` stands in for `trade.mb.io` (see the flagged section above).
+- **Geo-dependent locale**: mb.io force-redirects every request to the locale it geo-detects for the client (`/en-AE/…` from the Gulf, `/en/…` from GitHub's CI runners) — even explicitly requested locales are rewritten. Discovered when the first CI run failed on hard-coded `en-AE` URLs; all URL/href assertions are now locale-aware (built from `BasePage.current_locale` at runtime).
 - **No authentication**: no login or account creation is exercised; everything tested is publicly reachable.
 - **Live-site dependency**: tests run against production, so market data (prices, which pairs are gainers/losers) is asserted by *shape and invariants*, not exact values. Content changes (e.g. a sponsorship campaign ending) will surface as legitimate failures.
 - **Chromium** is the reference browser locally and in CI.

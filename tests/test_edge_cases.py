@@ -25,11 +25,13 @@ class TestEdgeCases:
         """
         response = page.goto(INVALID_ROUTE)
 
-        # Server must answer with a real 404, not a soft 200.
+        # Server must answer with a real 404, not a soft 200 (the status
+        # survives mb.io's geo-locale redirect, e.g. /en-AE/* -> /en/*).
         assert response is not None and response.status == 404
 
-        # No silent redirect: the bad URL stays in the address bar.
-        assert page.url == INVALID_ROUTE
+        # No silent redirect to home: the bad path stays in the address bar
+        # (only the locale prefix may be rewritten by geo-detection).
+        assert "this-route-does-not-exist" in page.url
 
         # A proper not-found page renders, with a recovery path back home.
         expect(page.get_by_role("heading", name="Page not found")).to_be_visible()
@@ -79,6 +81,7 @@ class TestEdgeCases:
         expect(sheet).to_be_visible()
 
         for label, href in NAV_ITEMS:
+            expected = href.format(locale=home.current_locale)
             link = sheet.get_by_role("link", name=label, exact=True)
             expect(link).to_be_visible()
-            assert link.get_attribute("href") == href, f"{label} points at wrong destination"
+            assert link.get_attribute("href") == expected, f"{label} points at wrong destination"
