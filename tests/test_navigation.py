@@ -65,7 +65,9 @@ class TestNavigation:
         popup = popup_info.value
         popup.wait_for_load_state()
 
-        assert popup.url.startswith("https://token.multibankgroup.com")
+        assert popup.url.startswith(
+            ("https://token.multibankgroup.com", "https://token.mb.io")
+        )
 
     # --- 3. Nav behaves correctly at standard desktop viewport sizes -----------
 

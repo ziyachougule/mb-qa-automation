@@ -7,6 +7,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false   # one browser failing shouldn't cancel the others
+      matrix:
+        browser: [chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@v4
 
@@ -18,17 +22,17 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Install Playwright browsers
-        run: playwright install --with-deps chromium
+      - name: Install Playwright browser
+        run: playwright install --with-deps ${{ matrix.browser }}
 
-      # pytest.ini's addopts already writes the HTML report to
-      # reports/report.html (--self-contained-html).
+      # Command-line --html overrides the path in pytest.ini's addopts,
+      # so each browser writes its own report file.
       - name: Run tests
-        run: pytest --browser chromium
+        run: pytest --browser ${{ matrix.browser }} --html=reports/report-${{ matrix.browser }}.html --self-contained-html
 
       - name: Upload HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-report
-          path: reports/report.html
+          name: pytest-report-${{ matrix.browser }}
+          path: reports/report-${{ matrix.browser }}.html
