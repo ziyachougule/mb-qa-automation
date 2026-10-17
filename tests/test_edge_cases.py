@@ -1,6 +1,7 @@
 from urllib.parse import urljoin
 
 import pytest
+pytestmark = pytest.mark.regression
 from playwright.sync_api import expect
 from pytest_playwright.pytest_playwright import page
 
@@ -16,7 +17,7 @@ MOBILE_MENU_TRIGGER = "role=button[name='Open menu']"
 
 class TestEdgeCases:
     """Failure-mode coverage: bad routes and the mobile breakpoint."""
-
+    @pytest.mark.smoke
     def test_invalid_route_shows_not_found_state(self, page):
         """Guards against broken 404 handling on unknown routes.
 

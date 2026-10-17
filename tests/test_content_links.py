@@ -1,6 +1,7 @@
 import re
 
 import pytest
+pytestmark = pytest.mark.regression
 from playwright.sync_api import expect
 
 from pages.about_page import AboutPage
@@ -37,7 +38,7 @@ class TestContentLinks:
     """Marketing banners, app-download links, and Why MultiBank page content."""
 
     # --- 1. Marketing banners render in the expected page region ---------------
-
+    @pytest.mark.smoke
     def test_hero_and_sponsorship_banners_visible(self, page):
         home = HomePage(page)
         home.goto()

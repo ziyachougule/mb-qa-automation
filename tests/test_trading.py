@@ -1,4 +1,5 @@
 import pytest
+pytestmark = pytest.mark.regression
 from playwright.sync_api import expect
 
 from pages.trading_page import TradingPage
@@ -22,7 +23,7 @@ class TestTrading:
     """Spot-pairs preview coverage: section rendering, grouping, row contents."""
 
     # --- 1. Section renders with all three categories --------------------------
-
+    @pytest.mark.smoke
     def test_spot_section_renders_all_categories(self, trading_page):
         assert trading_page.get_categories() == list(TradingPage.SPOT_CATEGORIES)
 

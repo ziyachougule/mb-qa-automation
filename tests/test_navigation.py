@@ -1,5 +1,6 @@
 import pytest
 import json
+pytestmark = pytest.mark.regression
 from pathlib import Path
 from playwright.sync_api import expect
 
@@ -24,7 +25,7 @@ class TestNavigation:
     """Main-nav coverage: presence, destinations, and desktop viewport behavior."""
 
     # --- 1. All expected nav items render and are visible ---------------------
-
+    @pytest.mark.smoke
     @pytest.mark.parametrize("label", NAV_LABELS)
     def test_nav_item_is_visible(self, page, label):
         home = HomePage(page)
