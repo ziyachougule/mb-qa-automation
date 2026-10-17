@@ -16,6 +16,34 @@ All the features the assignment describes (header nav, spot-pairs preview groupe
 
 ---
 
+## Update: second pass
+
+The brief's email now provides `https://mb.io/en-AE` as the fallback target, which
+is the site this suite already targeted. `trade.multibank.io` still redirects
+unauthenticated users to a login page (re-verified), so no target change was needed.
+
+Improvements in this pass:
+
+- **Cross-browser CI:** the suite runs on chromium, firefox and webkit as a GitHub
+  Actions matrix, with one report artifact per browser. A sample local 3-browser
+  report is in `docs/sample-execution-report-3-browsers.html`.
+- **Broken-link detection:** a third edge case that requests every nav link and
+  fails on 404 or 5xx.
+- **Parameterized test data:** nav items now live in `test-data/nav_items.json`
+  instead of being hardcoded in the test file.
+- **Smoke / regression markers:** `pytest -m smoke` runs the fast critical-path
+  checks, and `pytest -m regression` runs everything.
+- **Live-site drift fix:** the `$MBG` nav item now redirects from
+  `token.multibankgroup.com` to `token.mb.io`, and the assertion accepts either host.
+
+Run commands:
+
+    pytest                                                          # full suite, chromium
+    pytest -m smoke                                                 # smoke only
+    pytest --browser chromium --browser firefox --browser webkit    # all browsers
+
+---
+
 ## Prerequisites
 
 - Python **3.11+**
@@ -44,18 +72,18 @@ Open `reports/report.html` in any browser (it's self-contained, no server needed
 open reports/report.html   # macOS
 ```
 
-CI (`.github/workflows/tests.yml`) runs the suite on every push/PR and uploads the same report as a build artifact — even on failure, which is when you need it.
+CI (`.github/workflows/tests.yml`) runs the suite on every push/PR across chromium, firefox and webkit, and uploads one report per browser as a build artifact, even on failure, which is when you need it.
 
-## Test summary — 47 tests across 4 files
+## Test summary — 48 tests across 4 files
 
 | File | Tests | Covers |
 |---|---|---|
 | `tests/test_navigation.py` | 22 | All 6 nav items render, link to the correct destinations (`$MBG` opens a new tab), and behave at 1920×1080 / 1366×768 |
 | `tests/test_trading.py` | 9 | Spot-pairs section renders all 3 categories; pairs are grouped correctly; every row has icon, name, price, % change |
 | `tests/test_content_links.py` | 13 | Hero + sponsorship banners render in order; app-download deep link and QR popover work; all 11 Why MultiBank headings present |
-| `tests/test_edge_cases.py` | 3 | Unknown routes return a real 404 with a recovery link; nav collapses to a hamburger sheet at 375×667 exposing all 6 items |
+| `tests/test_edge_cases.py` | 4 | Unknown routes return a real 404 with a recovery link; nav collapses to a hamburger sheet at 375×667 exposing all 6 items; no nav link returns 404 or 5xx |
 
-All tests were verified green against the live site (two consecutive runs per file).
+All tests pass on chromium, firefox and webkit, both locally and in CI.
 
 ## Framework & design decisions
 
@@ -77,12 +105,12 @@ All tests were verified green against the live site (two consecutive runs per fi
 - **Geo-dependent locale**: mb.io force-redirects every request to the locale it geo-detects for the client (`/en-AE/…` from the Gulf, `/en/…` from GitHub's CI runners) — even explicitly requested locales are rewritten. Discovered when the first CI run failed on hard-coded `en-AE` URLs; all URL/href assertions are now locale-aware (built from `BasePage.current_locale` at runtime).
 - **No authentication**: no login or account creation is exercised; everything tested is publicly reachable.
 - **Live-site dependency**: tests run against production, so market data (prices, which pairs are gainers/losers) is asserted by *shape and invariants*, not exact values. Content changes (e.g. a sponsorship campaign ending) will surface as legitimate failures.
-- **Chromium** is the reference browser locally and in CI.
+- **Browsers**: CI runs the full suite on chromium, firefox and webkit; chromium is the default locally.
 
 ## Folder structure
 
 ```
-├── .github/workflows/tests.yml   # CI: pytest on push/PR, uploads HTML report artifact
+├── .github/workflows/tests.yml   # CI: chromium/firefox/webkit matrix, one HTML report per browser
 ├── pages/                        # Page Object Model classes
 │   ├── base_page.py              #   shared waits/clicks/visibility helpers
 │   ├── home_page.py              #   nav, banners, app download, spot-pairs preview

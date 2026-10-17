@@ -6,7 +6,7 @@ state.
 
 ## Test results
 
-- [x] Full suite green in CI on the release commit (47/47 — [run 28614612582](https://github.com/ziyachougule/mb-qa-automation/actions/runs/28614612582))
+- [x] Full suite green in CI on the release commit (48/48 on each of chromium, firefox and webkit; [Actions runs](https://github.com/ziyachougule/mb-qa-automation/actions))
 - [x] Full suite green locally, run twice consecutively (guards the SPA hydration races)
 - [x] Zero known flaky tests — anything flaky was fixed or cut in the same change, not skipped or retried into passing
 - [x] Suite passes in both locale environments (`en-AE` locally, `en` on CI runners)
