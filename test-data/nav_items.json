@@ -1,1 +1,8 @@
-[]
+[
+  { "label": "Explore",  "href": "/{locale}/explore" },
+  { "label": "Features", "href": "/{locale}/features" },
+  { "label": "OTC Desk", "href": "/{locale}/features/otc-desk" },
+  { "label": "Company",  "href": "/{locale}/company" },
+  { "label": "Support",  "href": "/{locale}/support" },
+  { "label": "$MBG",     "href": "https://token.multibankgroup.com/en" }
+]

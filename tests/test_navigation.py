@@ -1,4 +1,6 @@
 import pytest
+import json
+from pathlib import Path
 from playwright.sync_api import expect
 
 from pages.home_page import HomePage
@@ -8,14 +10,10 @@ from pages.home_page import HomePage
 # hrefs are templates filled in with the locale actually served — see
 # BasePage.current_locale. $MBG is the only external item (absolute URL,
 # opens in a new tab).
-NAV_ITEMS = [
-    ("Explore", "/{locale}/explore"),
-    ("Features", "/{locale}/features"),
-    ("OTC Desk", "/{locale}/features/otc-desk"),
-    ("Company", "/{locale}/company"),
-    ("Support", "/{locale}/support"),
-    ("$MBG", "https://token.multibankgroup.com/en"),
-]
+_NAV_DATA_FILE = Path(__file__).resolve().parent.parent / "test-data" / "nav_items.json"
+
+with _NAV_DATA_FILE.open(encoding="utf-8") as f:
+    NAV_ITEMS = [(item["label"], item["href"]) for item in json.load(f)]
 NAV_LABELS = [label for label, _ in NAV_ITEMS]
 INTERNAL_NAV_ITEMS = [(label, href) for label, href in NAV_ITEMS if href.startswith("/")]
 
