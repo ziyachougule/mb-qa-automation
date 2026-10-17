@@ -1,5 +1,8 @@
+from urllib.parse import urljoin
+
 import pytest
 from playwright.sync_api import expect
+from pytest_playwright.pytest_playwright import page
 
 from pages.home_page import HomePage
 from tests.test_navigation import NAV_ITEMS
@@ -85,3 +88,23 @@ class TestEdgeCases:
             link = sheet.get_by_role("link", name=label, exact=True)
             expect(link).to_be_visible()
             assert link.get_attribute("href") == expected, f"{label} points at wrong destination"
+    
+    def test_nav_links_are_not_broken(self, page):
+        """Guards against dead navigation entries.
+        
+        Real-world failure mode: a page gets renamed or removed and the nav still
+        points at it, so users hit a 404 from the most prominent element on the site.
+        Only 404 and 5xx count as broken. 401/403 from external hosts is usually bot
+        protection, not a dead link, so it would cause false failures.
+    """
+        home = HomePage(page)
+        home.goto()
+
+        broken = []
+        for label, href in home.get_nav_items():
+            url = urljoin(page.url, href)
+            response = page.request.get(url, timeout=30000)
+            if response.status == 404 or response.status >= 500:
+                broken.append(f"{label} -> {url} ({response.status})")
+
+        assert not broken, f"Broken navigation links: {broken}"
