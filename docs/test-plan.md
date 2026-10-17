@@ -5,7 +5,7 @@
 Verify that the public mb.io marketing site correctly renders and links its core
 user-facing content — navigation, the spot-trading preview, marketing banners,
 app-download entry points, and the company page — and that it degrades sanely at
-the edges (unknown routes, mobile viewport), using automated UI tests that run
+the edges (unknown routes, mobile viewport, broken nav links), using automated UI tests that run
 on every push.
 
 ## Scope
